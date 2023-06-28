@@ -18,6 +18,14 @@ export class App extends Component {
     showBtn: false,
   };
 
+  componentDidMount() {
+    document.addEventListener('keydown', this.handleKeyDown);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('keydown', this.handleKeyDown);
+  }
+
   componentDidUpdate(prevProps, prevState) {
     if (
       prevState.query !== this.state.query ||
@@ -35,12 +43,17 @@ export class App extends Component {
     this.setState(prevState => ({ page: prevState.page + 1 }));
   };
 
-  handleOpenModal = selectedImage => {
-    this.setState({ showModal: true, selectedImage });
+  toggleModal = selectedImage => {
+    this.setState(prevState => ({
+      showModal: !prevState.showModal,
+      selectedImage: selectedImage || null,
+    }));
   };
 
-  handleCloseModal = () => {
-    this.setState({ showModal: false, selectedImage: null });
+  handleKeyDown = e => {
+    if (e.key === 'Escape') {
+      this.toggleModal(null);
+    }
   };
 
   fetchImages = async () => {
@@ -74,7 +87,7 @@ export class App extends Component {
         <Searchbar onSubmit={this.handleSubmit} />
         <ImageGallery
           images={this.state.images}
-          onOpenModal={this.handleOpenModal}
+          onOpenModal={this.toggleModal}
         />
         {this.state.isLoading && <Loader />}
         {this.state.showBtn && (
@@ -83,7 +96,7 @@ export class App extends Component {
         {this.state.showModal && (
           <Modal
             showModal={this.state.showModal}
-            onCloseModal={this.handleCloseModal}
+            onCloseModal={this.toggleModal}
             selectedImage={this.state.selectedImage}
           />
         )}

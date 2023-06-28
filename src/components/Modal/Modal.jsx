@@ -1,30 +1,43 @@
+import { Component } from 'react';
 import { ModalImgStyled, ModalOverlayStyled, ModalStyled } from './Modal.styled';
-import PropTypes from 'prop-types';
 
-export const Modal = ({ showModal, onCloseModal, selectedImage }) => {
-  if (!showModal) {
-    return null;
+
+export class Modal extends Component {
+  componentDidMount() {
+    document.addEventListener('keydown', this.handleKeyDown);
   }
 
-  const handleContentClick = e => {
+  componentWillUnmount() {
+    document.removeEventListener('keydown', this.handleKeyDown);
+  }
+
+  handleContentClick = e => {
     e.stopPropagation();
   };
 
-  return (
-    <ModalOverlayStyled onClick={onCloseModal}>
-      <ModalStyled>
-        <ModalImgStyled
-          src={selectedImage.largeImageUrl}
-          alt={selectedImage.tags}
-          onClick={handleContentClick}
-        />
-      </ModalStyled>
-    </ModalOverlayStyled>
-  );
-};
+  handleKeyDown = e => {
+    if (e.key === 'Escape') {
+      this.props.onCloseModal();
+    }
+  };
 
-Modal.propTypes = {
-  showModal: PropTypes.bool.isRequired,
-  onCloseModal: PropTypes.func.isRequired,
-  selectedImage: PropTypes.object.isRequired,
-};
+  render() {
+    const { showModal, onCloseModal, selectedImage } = this.props;
+
+    if (!showModal) {
+      return null;
+    }
+
+    return (
+      <ModalOverlayStyled onClick={onCloseModal}>
+        <ModalStyled>
+          <ModalImgStyled
+            src={selectedImage.largeImageUrl}
+            alt={selectedImage.tags}
+            onClick={this.handleContentClick}
+          />
+        </ModalStyled>
+      </ModalOverlayStyled>
+    );
+  }
+}
