@@ -12,7 +12,7 @@ export const ImageGalleryItem = ({ img, onOpenModal }) => {
 ImageGalleryItem.propTypes = {
   img: PropTypes.shape({
     webformatUrl: PropTypes.string.isRequired,
-    tags: PropTypes.string.isRequired,
+    tags: PropTypes.string,
     largeImageUrl: PropTypes.string.isRequired,
   }).isRequired,
   onOpenModal: PropTypes.func.isRequired,
