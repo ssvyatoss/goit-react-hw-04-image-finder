@@ -1,13 +1,11 @@
 import React, { Component } from 'react';
-import axios from 'axios';
 import 'isomorphic-fetch';
 import { Searchbar } from './Searchbar/Searchbar';
 import { ImageGallery } from './ImageGallery/ImageGallery';
 import { Loader } from './Loader/Loader';
 import { Button } from './Button/Button';
 import { Modal } from './Modal/Modal';
-
-const API_KEY = '29953975-bb23bab1f41a1a145d54f17ae';
+import { fetchImg } from './FetchImg/FetchImg';
 
 export class App extends Component {
   state = {
@@ -17,6 +15,7 @@ export class App extends Component {
     isLoading: false,
     showModal: false,
     selectedImage: null,
+    showBtn: false,
   };
 
   componentDidUpdate(prevProps, prevState) {
@@ -46,38 +45,16 @@ export class App extends Component {
 
   fetchImages = async () => {
     const { query, page } = this.state;
-    const perPage = 12;
 
     try {
       this.setState({ isLoading: true });
 
-      const response = await axios.get('https://pixabay.com/api/', {
-        params: {
-          key: API_KEY,
-          q: query,
-          page: page,
-          per_page: perPage,
-          image_type: 'photo',
-          orientation: 'horizontal',
-        },
-      });
+      const { newImages, totalHits } = await fetchImg(query, page);
 
-      if (response.status === 200) {
-        const data = response.data;
-        const newImages = data.hits.map(image => ({
-          id: image.id,
-          webformatUrl: image.webformatURL,
-          largeImageUrl: image.largeImageURL,
-        }));
-
-        this.setState(prevState => ({
-          images: [...prevState.images, ...newImages],
-        }));
-      } else {
-        console.log('Request failed with status:', response.status);
-      }
-    } catch (error) {
-      console.log('Request failed with error:', error.message);
+      this.setState(prevState => ({
+        images: [...prevState.images, ...newImages],
+        showBtn: page < Math.ceil(totalHits / 12),
+      }));
     } finally {
       this.setState({ isLoading: false });
       this.scrollToNextPage();
@@ -100,7 +77,7 @@ export class App extends Component {
           onOpenModal={this.handleOpenModal}
         />
         {this.state.isLoading && <Loader />}
-        {this.state.images.length > 0 && !this.state.isLoading && (
+        {this.state.showBtn && (
           <Button onLoadMore={this.handleLoadMore} />
         )}
         {this.state.showModal && (
