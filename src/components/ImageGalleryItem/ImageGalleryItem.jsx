@@ -17,3 +17,4 @@ ImageGalleryItem.propTypes = {
   }).isRequired,
   onOpenModal: PropTypes.func.isRequired,
 };
+
