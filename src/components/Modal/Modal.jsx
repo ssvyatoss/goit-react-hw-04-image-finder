@@ -7,20 +7,19 @@ import {
 
 export const Modal = ({ showModal, onCloseModal, selectedImage }) => {
   useEffect(() => {
+    const handleKeyDown = e => {
+      if (e.key === 'Escape') {
+        onCloseModal();
+      }
+    };
     document.addEventListener('keydown', handleKeyDown);
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, []);
+  }, [onCloseModal]);
 
   const handleContentClick = e => {
     e.stopPropagation();
-  };
-
-  const handleKeyDown = e => {
-    if (e.key === 'Escape') {
-      onCloseModal();
-    }
   };
 
   if (!showModal) {
